@@ -14,7 +14,7 @@ jobs:
       - name: Build image and push to GitHub Packages (Docker Registry)
         uses: mr-smithers-excellent/docker-build-push@v6
         with:
-          image: ${{ github.event.repository.name }}
+          image: ${{ github.event.repository.name | toLowerCase }}  # แปลงเป็นตัวพิมพ์เล็ก
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
@@ -24,13 +24,13 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CONTAINER_NAME: 'vue-app-005'
-      # Convert the repository name to lowercase
+      # แปลง Docker image URL เป็นตัวพิมพ์เล็ก
       DOCKER_IMAGE_URL: 'ghcr.io/${{ github.actor }}/${{ github.event.repository.name | toLowerCase }}:${{ github.ref_name }}'
     steps:
     - name: executing remote ssh commands using password
       uses: appleboy/ssh-action@v1.0.0
       with:
-        host: '167.172.92.228'  #production url: 159.223.41.181:9003
+        host: '167.172.92.228'  # production url: 159.223.41.181:9003
         username: 'root'
         password: 'se@2026NPRU'
         port: '22'
