@@ -24,7 +24,7 @@ jobs:
     needs: release-docker-image-job
     runs-on: ubuntu-latest
     env:
-      CONTAINER_NAME: 'ntkfxy/vue-app-005'
+      CONTAINER_NAME: 'ntkfxy-vue-app-005'
       DOCKER_IMAGE_URL: 'ghcr.io/${{ github.actor }}/${{ github.event.repository.name }}:${{  github.ref_name }}'
     steps:
     - name: executing remote ssh commands using password
