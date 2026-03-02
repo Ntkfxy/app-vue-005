@@ -11,16 +11,20 @@ jobs:
 
     permissions:
       contents: read
-      packages: write   # ⭐ สำคัญมาก
+      packages: write
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set lowercase owner
+        id: vars
+        run: echo "OWNER_LC=${GITHUB_ACTOR,,}" >> $GITHUB_ENV
 
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
+          username: ${{ env.OWNER_LC }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and Push Docker image
@@ -28,17 +32,16 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.actor }}/app-vue-005:latest
+          tags: ghcr.io/${{ env.OWNER_LC }}/app-vue-005:latest
 
   auto-deploy-docker-job:
     needs: release-docker-image-job
     runs-on: ubuntu-latest
 
-    env:
-      CONTAINER_NAME: 'vue-app-005'
-      DOCKER_IMAGE_URL: 'ghcr.io/${{ github.actor }}/app-vue-005:latest'
-
     steps:
+      - name: Set lowercase owner
+        run: echo "OWNER_LC=${GITHUB_ACTOR,,}" >> $GITHUB_ENV
+
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -47,7 +50,7 @@ jobs:
           password: 'se@2026NPRU'
           port: '22'
           script: |
-            docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
+            docker login ghcr.io -u $OWNER_LC -p ${{ secrets.GITHUB_TOKEN }}
             docker rm -f vue-app-005 || true
-            docker pull ghcr.io/${{ github.actor }}/app-vue-005:latest
-            docker run -d --restart=always --name vue-app-005 -p 9005:80 ghcr.io/${{ github.actor }}/app-vue-005:latest
+            docker pull ghcr.io/$OWNER_LC/app-vue-005:latest
+            docker run -d --restart=always --name vue-app-005 -p 9005:80 ghcr.io/$OWNER_LC/app-vue-005:latest
