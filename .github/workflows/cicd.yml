@@ -3,7 +3,7 @@ name: 'build and deploy vue app'
 on:
   push:
     branches: 
-      - main
+      - xxxx
 
 jobs:
   build-and-deploy:
